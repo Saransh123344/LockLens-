@@ -1,0 +1,21 @@
+{
+  "name": "locklens-desktop",
+  "version": "2.0.0",
+  "description": "LockLens Secure Exam Desktop Client",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron . --dev",
+    "start:prod": "electron .",
+    "rebuild": "electron-rebuild -f -w keyboard_blocker"
+  },
+  "dependencies": {
+    "node-addon-api": "^7.0.0"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-rebuild": "^3.2.9"
+  },
+  "build": {
+    "nativeRebuilder": "sequential"
+  }
+}
