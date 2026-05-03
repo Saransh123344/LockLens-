@@ -11,7 +11,8 @@ import type { Question, FeatureFlags, ViolationType } from '../../../types';
 import PreflightCheck from '../components/PreflightCheck';
 
 type Phase = 'preflight' | 'verification' | 'exam' | 'paused' | 'submitted' | 'terminated';
-type AIViolation = 'NO_FACE' | 'MULTIPLE_FACES' | 'MISMATCH_FACE' | null;
+// Add 'OBJECT_DETECTED' to the list of things that can pause the exam
+type AIViolation = 'NO_FACE' | 'MULTIPLE_FACES' | 'MISMATCH_FACE' | 'OBJECT_DETECTED' | null;
 
 const IS_ELECTRON = !!window.electronAPI?.isElectron;
 
@@ -96,8 +97,15 @@ export default function ExamRoomPage() {
   }, []);
 
   const handleViolation = useCallback((_type: ViolationType | string) => {
+    // 1. Keep the existing logging (saves the last 20 violations)
     setViolations(prev => [{ type: _type, time: new Date() }, ...prev.slice(0, 19)]);
-  }, []);
+
+    // 2. NEW: Pause the exam if a banned object is detected
+    if (_type === 'OBJECT_DETECTED') {
+      setAiViolation('OBJECT_DETECTED'); // Tell the UI why it paused
+      setPhase('paused');                // Trigger the lockdown screen
+    }
+  }, []); // Note: Depending on your ESLint rules, you may need to add setAiViolation and setPhase into this dependency array.
 
   // ── 3. Fullscreen & Window Tracking ────────────────────────────────────────
   const handleFullscreenLost = useCallback(() => {

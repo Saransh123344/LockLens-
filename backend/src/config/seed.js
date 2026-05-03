@@ -9,9 +9,13 @@ const db = getDb();
 
 const users = [
   { name: 'Admin User', email: 'admin@locklens.com', password: 'admin123', role: 'admin' },
+  { name: 'Admin User', email: 'admin1@locklens.com', password: 'admin123', role: 'admin' },
+  { name: 'Test Admin User', email: '1', password: '1', role: 'admin' },
   { name: 'Dr. Smith', email: 'examiner@locklens.com', password: 'examiner123', role: 'examiner' },
-  { name: 'John Student', email: 'student@locklens.com', password: 'student123', role: 'student' },
-  { name: 'Jane Student', email: 'jane@locklens.com', password: 'student123', role: 'student' },
+  { name: 'Dr. James', email: 'examiner1@locklens.com', password: 'examiner123', role: 'examiner' },
+  { name: 'Alice Student', email: 'alice@locklens.com', password: 'student123', role: 'student' },
+  { name: 'Bob Student', email: 'bob@locklens.com', password: 'student123', role: 'student' },
+  { name: 'Candy Student', email: 'candy@locklens.com', password: 'student123', role: 'student' },
 ];
 
 const insertUser = db.prepare(`

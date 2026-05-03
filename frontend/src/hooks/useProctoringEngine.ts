@@ -212,18 +212,30 @@ export function useProctoringEngine(opts: ProctoringOptions) {
   }, [flags.tab_switch_detection, logViolation, onWarning]);
 
   // ── FOCUS LOSS DETECTION + AGGRESSIVE REFOCUS ────────────────────────────
+  // ── FOCUS LOSS DETECTION (Debounced for internal clicks) ────────────
   useEffect(() => {
     if (!flags.focus_loss_detection) return;
+
     const onBlur = () => {
-      logViolation('FOCUS_LOSS', 'Browser window lost focus');
-      onWarning('⚠️ Window focus lost. Return to the exam immediately.');
-      // Attempt to steal focus back up to 3 times
-      [100, 400, 900].forEach(d => setTimeout(() => { try { window.focus(); } catch {} }, d));
+      // Wait 150ms before checking if they actually left the app
+      setTimeout(() => {
+        // document.hasFocus() checks if the user's cursor/focus is ANYWHERE 
+        // inside the document body. This ignores internal button clicks.
+        if (!document.hasFocus()) {
+          logViolation('FOCUS_LOSS', 'Browser window lost focus');
+          onWarning('⚠️ Window focus lost. Return to the exam immediately.');
+          
+          // Attempt to politely request focus back
+          [100, 400, 900].forEach(d => setTimeout(() => { try { window.focus(); } catch {} }, d));
+        }
+      }, 150);
     };
+
     window.addEventListener('blur', onBlur, { capture: true });
-    captureCleanupRef.current.push(() =>
-      window.removeEventListener('blur', onBlur, { capture: true })
-    );
+    
+    return () => {
+      window.removeEventListener('blur', onBlur, { capture: true });
+    };
   }, [flags.focus_loss_detection, logViolation, onWarning]);
 
   // ── SCREEN SHARE BLOCKING ────────────────────────────────────────────────

@@ -3,23 +3,23 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
+  define: {
+    // Stops face-api.js from silently crashing
+    'process.env': {}
+  },
   server: {
     port: 5173,
-    host: true,          // ← listen on 0.0.0.0 so other devices on the network can connect
-    allowedHosts: true,  // ← This stops Vite from blocking your Ngrok URL
+    host: true,
+    allowedHosts: true,
     proxy: {
-      '/api': {
-        target: 'http://localhost:4000',
-        changeOrigin: true,
-      },
-      '/socket.io': {
-        target: 'http://localhost:4000',
-        changeOrigin: true,
-        ws: true,
-      },
+      '/api': { target: 'http://localhost:4000', changeOrigin: true },
+      '/socket.io': { target: 'http://localhost:4000', changeOrigin: true, ws: true },
     },
   },
   optimizeDeps: {
-    exclude: ['face-api.js'],
-  },
+    // This tells the internal bundler to never print warnings
+    esbuildOptions: {
+      logLevel: 'silent', 
+    }
+  }
 })
